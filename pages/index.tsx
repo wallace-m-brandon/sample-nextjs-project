@@ -13,8 +13,7 @@ import {
 import styles from "../styles/Home.module.css";
 import { AppHeader } from "../components/AppHeader";
 
-export default function Home({ data }) {
-  const [firstInteraction, setFirstInteraction] = useState(true);
+export default function Home({ data, isSSR }) {
   return (
     <div className={styles.container}>
       <Head>
@@ -57,7 +56,7 @@ export default function Home({ data }) {
             </TableBody>
           </Table>
         </TableContainer>
-        {firstInteraction ? (
+        {isSSR ? (
           <p className={styles.description}>
             This page was pre-rendered with Server Side Rendering. Aint that
             cool?
@@ -111,5 +110,5 @@ export async function getServerSideProps() {
     }
   });
   // Pass data to the page via props
-  return { props: { data } };
+  return { props: { data, isSSR: true } };
 }
