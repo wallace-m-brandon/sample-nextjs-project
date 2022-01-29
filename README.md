@@ -13,6 +13,7 @@ Please access the application here: https://sample-nextjs-project-jade.vercel.ap
 - Jest unit tests for components and functions
 - CI/CD configuration to automatically run above unit tests
 - Improve mobile support
+- Extract all inline styling to seperate styling files
 
 ---
 
