@@ -1,9 +1,21 @@
+import React, { useEffect, useState } from "react";
 import Head from "next/head";
 import Image from "next/image";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+} from "@mui/material";
 import styles from "../styles/Home.module.css";
 import { AppHeader } from "../components/AppHeader";
 
 export default function Home({ data }) {
+  const [firstInteraction, setFirstInteraction] = useState(true);
+  console.log("yeah");
   return (
     <div className={styles.container}>
       <Head>
@@ -21,46 +33,40 @@ export default function Home({ data }) {
           Welcome to <a href="https://nextjs.org">Next.js!</a>
         </h1>
 
-        <p className={styles.description}>
-          Get started by editing{" "}
-          <code className={styles.code}>pages/index.js</code>
-        </p>
-
-        <div className={styles.grid}>
-          <a href="https://nextjs.org/docs" className={styles.card}>
-            <h2>Documentation &rarr;</h2>
-            <p>Find in-depth information about Next.js features and API.</p>
-          </a>
-
-          <a href="https://nextjs.org/learn" className={styles.card}>
-            <h2>Learn &rarr;</h2>
-            <p>Learn about Next.js in an interactive course with quizzes!</p>
-          </a>
-
-          <a
-            href="https://github.com/vercel/next.js/tree/canary/examples"
-            className={styles.card}
-          >
-            <h2>Examples &rarr;</h2>
-            <p>Discover and deploy boilerplate example Next.js projects.</p>
-          </a>
-
-          <a
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-          >
-            <h2>Deploy &rarr;</h2>
-            <p>
-              Instantly deploy your Next.js site to a public URL with Vercel.
-            </p>
-          </a>
-        </div>
-        <div style={{ display: "block" }}>
-          {data &&
-            data.map((data, idx) => (
-              <p key={idx}>{data.date + ", " + data.name}</p>
-            ))}
-        </div>
+        <TableContainer component={Paper} sx={{ maxWidth: 550 }}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell align="left">Holiday Name</TableCell>
+                <TableCell align="right">Date</TableCell>
+                <TableCell align="right">Global Holiday</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {data &&
+                data.map((holiday) => (
+                  <TableRow key={holiday.name}>
+                    <TableCell component="th" scope="row">
+                      {holiday.name}
+                    </TableCell>
+                    <TableCell align="right">{holiday.date}</TableCell>
+                    <TableCell align="right">
+                      {holiday.global ? "YES" : "NO"}
+                    </TableCell>
+                  </TableRow>
+                ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+        {firstInteraction ? (
+          <p className={styles.description}>
+            This page was rendered with Server Side Rendering. Aint that cool?
+          </p>
+        ) : (
+          <p className={styles.description}>
+            This code was executed in the browser!
+          </p>
+        )}
       </main>
 
       <footer className={styles.footer}>
@@ -91,7 +97,18 @@ export async function getServerSideProps() {
   const res = await fetch(
     `https://date.nager.at/api/v3/PublicHolidays/${year}/US`
   );
-  const data = await res.json();
+  const raw = await res.json();
+  const hashTable = {};
+
+  //API is providing duplicates, filter them out
+  const data = raw.filter((obj) => {
+    if (!hashTable[obj.name]) {
+      hashTable[obj.name] = true;
+      return true;
+    } else {
+      return false;
+    }
+  });
   // Pass data to the page via props
   return { props: { data } };
 }
