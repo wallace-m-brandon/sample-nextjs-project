@@ -55,6 +55,12 @@ export default function Home({ data }) {
             </p>
           </a>
         </div>
+        <div style={{ display: "block" }}>
+          {data &&
+            data.map((data, idx) => (
+              <p key={idx}>{data.date + ", " + data.name}</p>
+            ))}
+        </div>
       </main>
 
       <footer className={styles.footer}>
@@ -73,6 +79,12 @@ export default function Home({ data }) {
   );
 }
 
+/**
+ * Next.js Server Side Rendering
+ * Calls the API on the server and pre-renders the page HTML before serving
+ * to user
+ * @returns props to pass to the page component
+ */
 export async function getServerSideProps() {
   // Fetch data from external API
   const year = new Date().getFullYear();
