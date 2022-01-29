@@ -4,7 +4,6 @@ import styles from "../styles/Home.module.css";
 import { AppHeader } from "../components/AppHeader";
 
 export default function Home({ data }) {
-  console.log(data);
   return (
     <div className={styles.container}>
       <Head>
