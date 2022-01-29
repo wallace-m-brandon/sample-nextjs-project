@@ -1,7 +1,7 @@
 # Local Weather 1.0
 This is an example application written by me to display some working React, running on Next.js and deployed on Vercel.
 
-Special thanks to [Material UI](https://mui.com/) and [Date.Nager](https://date.nager.at/API) for their component library and open source API, respectively.
+Special thanks to [Material UI](https://mui.com/) and [Nager.Date](https://date.nager.at/API) for their component library and open source API, respectively.
 
 Please access the application here: https://sample-nextjs-project-jade.vercel.app/
 
