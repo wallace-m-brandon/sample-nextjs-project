@@ -3,29 +3,74 @@ import Head from "next/head";
 import Image from "next/image";
 import {
   Button,
+  CircularProgress,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Paper,
+  Select,
+  SelectChangeEvent,
   Table,
   TableBody,
   TableCell,
   TableContainer,
   TableHead,
   TableRow,
-  Paper,
 } from "@mui/material";
 import styles from "../styles/Home.module.css";
 import { AppHeader } from "../components/AppHeader";
 
+const countryTable = {};
+
 export default function Home({ data, server }) {
-  const [holidays, setHolidays] = useState(data);
-  const [isSSR, setIsSSR] = useState(server);
-  const btn = useCallback(async () => {
-    window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
-    setIsSSR(false);
-    const year = new Date().getFullYear();
-    const newData = await fetch(
-      `https://date.nager.at/api/v3/PublicHolidays/${year}/DE`
+  const [holidays, setHolidays] = useState<[Record<string, any>]>(data);
+  const [country, setCountry] = useState<string>("US");
+  const [isSSR, setIsSSR] = useState<boolean>(server);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  const handleChange = useCallback(
+    async (e: SelectChangeEvent) => {
+      window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+      const newCountry = e.target.value as string;
+      setCountry(newCountry);
+      setIsLoading(true);
+      setIsSSR(false);
+
+      const year = new Date().getFullYear();
+      const raw = await fetch(
+        `https://date.nager.at/api/v3/PublicHolidays/${year}/${newCountry}`
+      );
+      const hashTable = {};
+      const newData = (await raw.json()).filter((obj) => {
+        if (!hashTable[obj.name]) {
+          hashTable[obj.name] = true;
+          return true;
+        } else {
+          return false;
+        }
+      });
+      setHolidays(newData);
+
+      setIsLoading(false);
+    },
+    [country, holidays, isLoading, isSSR]
+  );
+
+  // Placeholder spinner for loading state
+  if (isLoading) {
+    return (
+      <div
+        style={{
+          position: "absolute",
+          left: "50%",
+          top: "50%",
+          transform: "translate(-50%, -50%)",
+        }}
+      >
+        <CircularProgress size={300} />
+      </div>
     );
-    setHolidays(await newData.json());
-  }, [holidays, isSSR]);
+  }
 
   return (
     <div className={styles.container}>
@@ -43,6 +88,34 @@ export default function Home({ data, server }) {
         <h1 className={styles.title}>
           Welcome to <a href="https://nextjs.org">Next.js!</a>
         </h1>
+
+        <div
+          style={{
+            alignItems: "center",
+            display: "flex",
+            minWidth: "550px",
+            marginBottom: "2rem",
+          }}
+        >
+          <FormControl fullWidth>
+            <InputLabel id="demo-simple-select-label">Country</InputLabel>
+            <Select
+              labelId="demo-simple-select-label"
+              id="demo-simple-select"
+              value={country}
+              label="Country"
+              onChange={handleChange}
+            >
+              <MenuItem value="CA">Canada</MenuItem>
+              <MenuItem value="FR">France</MenuItem>
+              <MenuItem value="DE">Germany</MenuItem>
+              <MenuItem value="ES">Spain</MenuItem>
+              <MenuItem value="MX">Mexico</MenuItem>
+              <MenuItem value="GB">United Kingdom</MenuItem>
+              <MenuItem value="US">United States</MenuItem>
+            </Select>
+          </FormControl>
+        </div>
 
         <TableContainer component={Paper} sx={{ maxWidth: 550 }}>
           <Table>
@@ -71,16 +144,16 @@ export default function Home({ data, server }) {
         </TableContainer>
         {isSSR ? (
           <p className={styles.description}>
-            This page was pre-rendered with Server Side Rendering. Aint that
-            cool?
+            This page was pre-rendered with Server Side Rendering, meaning we
+            have SEO support out of the box. 'Aint that cool?
           </p>
         ) : (
           <p className={styles.description}>
             But with Next, we can still rely on client code for dynamic
-            applications!
+            applications! That API call was made in the browser.
           </p>
         )}
-        <Button onClick={btn}>Click me!</Button>
+        {/* <Button onClick={handleInput}>Click me!</Button> */}
       </main>
 
       <footer className={styles.footer}>
@@ -114,7 +187,7 @@ export async function getServerSideProps() {
   const raw = await res.json();
   const hashTable = {};
 
-  //API is providing duplicates, filter them out
+  // API is providing duplicates, filter them out
   const data = raw.filter((obj) => {
     if (!hashTable[obj.name]) {
       hashTable[obj.name] = true;
@@ -123,6 +196,6 @@ export async function getServerSideProps() {
       return false;
     }
   });
-  // Pass data to the page via props
+  // Pass data to the page via props key
   return { props: { data, server: true } };
 }
