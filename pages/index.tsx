@@ -1,8 +1,7 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useState } from "react";
 import Head from "next/head";
 import Image from "next/image";
 import {
-  Button,
   CircularProgress,
   FormControl,
   InputLabel,
@@ -20,7 +19,27 @@ import {
 import styles from "../styles/Home.module.css";
 import { AppHeader } from "../components/AppHeader";
 
-const countryTable = {};
+const getHolidaysByYearAndCountry = async (
+  year: number,
+  country: string
+): Promise<[Record<string, any>]> => {
+  const res = await fetch(
+    `https://date.nager.at/api/v3/PublicHolidays/${year}/${country}`
+  );
+  const raw = await res.json();
+  const hashTable = {};
+
+  // API is providing duplicates, filter them out
+  const data = raw.filter((obj) => {
+    if (!hashTable[obj.name]) {
+      hashTable[obj.name] = true;
+      return true;
+    } else {
+      return false;
+    }
+  });
+  return data;
+};
 
 export default function Home({ data, server }) {
   const [holidays, setHolidays] = useState<[Record<string, any>]>(data);
@@ -32,25 +51,15 @@ export default function Home({ data, server }) {
     async (e: SelectChangeEvent) => {
       window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
       const newCountry = e.target.value as string;
+
       setCountry(newCountry);
       setIsLoading(true);
       setIsSSR(false);
 
       const year = new Date().getFullYear();
-      const raw = await fetch(
-        `https://date.nager.at/api/v3/PublicHolidays/${year}/${newCountry}`
-      );
-      const hashTable = {};
-      const newData = (await raw.json()).filter((obj) => {
-        if (!hashTable[obj.name]) {
-          hashTable[obj.name] = true;
-          return true;
-        } else {
-          return false;
-        }
-      });
-      setHolidays(newData);
+      const newData = await getHolidaysByYearAndCountry(year, newCountry);
 
+      setHolidays(newData);
       setIsLoading(false);
     },
     [country, holidays, isLoading, isSSR]
@@ -85,9 +94,9 @@ export default function Home({ data, server }) {
       <AppHeader logo={"Local Holidays 1.0"} />
 
       <main className={styles.main}>
-        <h1 className={styles.title}>
+        {/* <h1 className={styles.title}>
           Welcome to <a href="https://nextjs.org">Next.js!</a>
-        </h1>
+        </h1> */}
 
         <div
           style={{
@@ -107,10 +116,13 @@ export default function Home({ data, server }) {
               onChange={handleChange}
             >
               <MenuItem value="CA">Canada</MenuItem>
+              <MenuItem value="CN">China</MenuItem>
               <MenuItem value="FR">France</MenuItem>
               <MenuItem value="DE">Germany</MenuItem>
-              <MenuItem value="ES">Spain</MenuItem>
+              <MenuItem value="IE">Ireland</MenuItem>
               <MenuItem value="MX">Mexico</MenuItem>
+              <MenuItem value="RU">Russia</MenuItem>
+              <MenuItem value="ES">Spain</MenuItem>
               <MenuItem value="GB">United Kingdom</MenuItem>
               <MenuItem value="US">United States</MenuItem>
             </Select>
@@ -143,17 +155,16 @@ export default function Home({ data, server }) {
           </Table>
         </TableContainer>
         {isSSR ? (
-          <p className={styles.description}>
-            This page was pre-rendered with Server Side Rendering, meaning we
-            have SEO support out of the box. 'Aint that cool?
+          <p className={styles.description} style={{ marginBottom: 0 }}>
+            This page was pre-rendered with Next.js Server Side Rendering,
+            meaning we have SEO support out of the box. 'Aint that cool?
           </p>
         ) : (
-          <p className={styles.description}>
+          <p className={styles.description} style={{ marginBottom: 0 }}>
             But with Next, we can still rely on client code for dynamic
             applications! That API call was made in the browser.
           </p>
         )}
-        {/* <Button onClick={handleInput}>Click me!</Button> */}
       </main>
 
       <footer className={styles.footer}>
@@ -181,21 +192,8 @@ export default function Home({ data, server }) {
 export async function getServerSideProps() {
   // Fetch data from external API
   const year = new Date().getFullYear();
-  const res = await fetch(
-    `https://date.nager.at/api/v3/PublicHolidays/${year}/US`
-  );
-  const raw = await res.json();
-  const hashTable = {};
+  const data = await getHolidaysByYearAndCountry(year, "US");
 
-  // API is providing duplicates, filter them out
-  const data = raw.filter((obj) => {
-    if (!hashTable[obj.name]) {
-      hashTable[obj.name] = true;
-      return true;
-    } else {
-      return false;
-    }
-  });
   // Pass data to the page via props key
   return { props: { data, server: true } };
 }
