@@ -94,10 +94,6 @@ export default function Home({ data, server }) {
       <AppHeader logo={"Local Holidays 1.0"} />
 
       <main className={styles.main}>
-        {/* <h1 className={styles.title}>
-          Welcome to <a href="https://nextjs.org">Next.js!</a>
-        </h1> */}
-
         <div
           style={{
             alignItems: "center",
