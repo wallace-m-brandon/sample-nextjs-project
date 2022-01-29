@@ -1,5 +1,9 @@
 # Local Weather 1.0
-This is an example application written by me to display some working React, running on Next.js and deployed on Vercel.
+This is an example application written by me to display some working React, running on Next.js and deployed on Vercel. 
+
+This application displays Next's ability to combine Server Side Rendering with Client Side Rendering. This approach nets us working SEO out of the box, as well as reduced time to first paint and time to first interaction for end users — but still allows us to create dynamic applications with user input.
+
+This project supports linting, code styling, server-rendered components including the styled-components library, and automatic deployment and hosting courtesy of Vercel. 
 
 Special thanks to [Material UI](https://mui.com/) and [Nager.Date](https://date.nager.at/API) for their component library and open source API, respectively.
 
