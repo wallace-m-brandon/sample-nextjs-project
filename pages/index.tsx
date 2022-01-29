@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import Head from "next/head";
 import Image from "next/image";
 import {
+  Button,
   Table,
   TableBody,
   TableCell,
@@ -13,7 +14,19 @@ import {
 import styles from "../styles/Home.module.css";
 import { AppHeader } from "../components/AppHeader";
 
-export default function Home({ data, isSSR }) {
+export default function Home({ data, server }) {
+  const [holidays, setHolidays] = useState(data);
+  const [isSSR, setIsSSR] = useState(server);
+  const btn = useCallback(async () => {
+    window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+    setIsSSR(false);
+    const year = new Date().getFullYear();
+    const newData = await fetch(
+      `https://date.nager.at/api/v3/PublicHolidays/${year}/DE`
+    );
+    setHolidays(await newData.json());
+  }, [holidays, isSSR]);
+
   return (
     <div className={styles.container}>
       <Head>
@@ -41,8 +54,8 @@ export default function Home({ data, isSSR }) {
               </TableRow>
             </TableHead>
             <TableBody>
-              {data &&
-                data.map((holiday) => (
+              {holidays &&
+                holidays.map((holiday) => (
                   <TableRow key={holiday.name}>
                     <TableCell component="th" scope="row">
                       {holiday.name}
@@ -67,6 +80,7 @@ export default function Home({ data, isSSR }) {
             applications!
           </p>
         )}
+        <Button onClick={btn}>Click me!</Button>
       </main>
 
       <footer className={styles.footer}>
@@ -110,5 +124,5 @@ export async function getServerSideProps() {
     }
   });
   // Pass data to the page via props
-  return { props: { data, isSSR: true } };
+  return { props: { data, server: true } };
 }
