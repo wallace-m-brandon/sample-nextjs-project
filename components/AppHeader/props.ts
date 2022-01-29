@@ -2,4 +2,4 @@ interface AppHeaderProps {
   logo: string;
 }
 
-export { AppHeaderProps };
+export type { AppHeaderProps };
