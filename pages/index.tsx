@@ -27,10 +27,10 @@ const getHolidaysByYearAndCountry = async (
     `https://date.nager.at/api/v3/PublicHolidays/${year}/${country}`
   );
   const raw = await res.json();
-  const hashTable = {};
 
   // API is providing duplicates, filter them out
-  const data = raw.filter((obj) => {
+  const hashTable = {};
+  const data = raw.filter((obj: Record<string, any>) => {
     if (!hashTable[obj.name]) {
       hashTable[obj.name] = true;
       return true;
@@ -38,9 +38,17 @@ const getHolidaysByYearAndCountry = async (
       return false;
     }
   });
+
   return data;
 };
 
+/**
+ * Page component that represents the homepage.
+ * Uses Next.js server side rendering for user's first pageload.
+ * @param data: API data passed in from the initial SSR pass
+ * @param isSSR: Flag to display the initial welcome message
+ * @returns Homepage Component
+ */
 export default function Home({ data, server }) {
   const [holidays, setHolidays] = useState<[Record<string, any>]>(data);
   const [country, setCountry] = useState<string>("US");

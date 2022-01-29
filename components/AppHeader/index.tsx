@@ -3,6 +3,11 @@ import { AppBar, Container, Typography } from "@mui/material";
 import { AppHeaderProps } from "./props";
 import { HorizontalContainer } from "./styles";
 
+/**
+ * Header component for Local Holidays 1.0.
+ * @param logo: Text to display as the top left logo
+ * @returns AppBar component
+ */
 const AppHeader = ({ logo }: AppHeaderProps) => {
   return (
     <AppBar position="static">
