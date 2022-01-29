@@ -15,7 +15,6 @@ import { AppHeader } from "../components/AppHeader";
 
 export default function Home({ data }) {
   const [firstInteraction, setFirstInteraction] = useState(true);
-  console.log("yeah");
   return (
     <div className={styles.container}>
       <Head>
@@ -60,11 +59,13 @@ export default function Home({ data }) {
         </TableContainer>
         {firstInteraction ? (
           <p className={styles.description}>
-            This page was rendered with Server Side Rendering. Aint that cool?
+            This page was pre-rendered with Server Side Rendering. Aint that
+            cool?
           </p>
         ) : (
           <p className={styles.description}>
-            This code was executed in the browser!
+            But with Next, we can still rely on client code for dynamic
+            applications!
           </p>
         )}
       </main>
