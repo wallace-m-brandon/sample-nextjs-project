@@ -122,6 +122,7 @@ export default function Home({ data, server }) {
               <MenuItem value="IE">Ireland</MenuItem>
               <MenuItem value="MX">Mexico</MenuItem>
               <MenuItem value="RU">Russia</MenuItem>
+              <MenuItem value="ZA">South Africa</MenuItem>
               <MenuItem value="ES">Spain</MenuItem>
               <MenuItem value="GB">United Kingdom</MenuItem>
               <MenuItem value="US">United States</MenuItem>
